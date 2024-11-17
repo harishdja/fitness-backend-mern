@@ -231,18 +231,19 @@ const updateTrainerReviews = async (req, res, next) => {
     }
   
     const {rating} = req.body;
-    const trainerId = req.params.trainerId;
+    const {trainerId} = req.query;
   
     let trainer;
     try {
       trainer = await Trainer.findById(trainerId);
-    } catch (err) {
+    } catch (err) { 
       const error = new HttpError(
         'Something went wrong, could not update place.',
         500
       );
       return next(error);
     }
+    console.log('trainer',trainer)
     trainer.rating.totalRating += rating;
     trainer.rating.numberOfRatings += 1;
 
