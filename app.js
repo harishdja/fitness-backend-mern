@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-const placesRoutes = require('./routes/places-routes');
+
 const trainerRoutes = require('./routes/trainer-routes');
 const usersRoutes = require('./routes/users-routes');
 const HttpError = require('./models/http-error');
@@ -11,7 +11,6 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.use('/api/places', placesRoutes);
 app.use('/api/trainer', trainerRoutes);
 app.use('/api/users', usersRoutes);
 
