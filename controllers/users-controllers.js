@@ -2,7 +2,8 @@ const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
-
+const Trainer=require('../models/trainer');
+const Member=require('../models/member');
 const getUsers = async (req, res, next) => {
   let users;
   try {
@@ -18,44 +19,19 @@ const getUsers = async (req, res, next) => {
 };
 
 const signup = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
-    );
-  }
-  const { name, email, password } = req.body;
-
-  let existingUser
-  try {
-    existingUser = await User.findOne({ email: email })
-  } catch (err) {
-    const error = new HttpError(
-      'Signing up failed, please try again later.',
-      500
-    );
-    return next(error);
-  }
-  
-  if (existingUser) {
-    const error = new HttpError(
-      'User exists already, please login instead.',
-      422
-    );
-    return next(error);
-  }
-  
-  const createdUser = new User({
+    const { name, email, password,type } = req.body;
+  const UserType=type==="trainer"?Trainer:Member
+  const createdUser = new UserType({
     name,
     email,
-    image: 'https://live.staticflickr.com/7631/26849088292_36fc52ee90_b.jpg',
+    profilePic: 'https://live.staticflickr.com/7631/26849088292_36fc52ee90_b.jpg',
     password,
-    places: []
+    type
   });
-
   try {
     await createdUser.save();
   } catch (err) {
+    console.log(err)
     const error = new HttpError(
       'Signing up failed, please try again.',
       500
