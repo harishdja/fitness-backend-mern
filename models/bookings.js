@@ -7,7 +7,7 @@ const bookingSchema = new Schema({
     status: { type: String, required: true },
     confirmationNotificationSent:{ type: Boolean, required: true },
     scheduledClassId: { type: mongoose.Types.ObjectId, required: true,ref:'Schedule' },
-    creator: { type: mongoose.Types.ObjectId, required: true, ref: 'User'}
+    creator: { type: mongoose.Types.ObjectId, required: true, ref: 'Member'}
 });
 
 module.exports = mongoose.model('Booking', bookingSchema);

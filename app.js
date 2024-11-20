@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 
 const trainerRoutes = require('./routes/trainer-routes');
+const scheduleRoutes=require('./routes/scheduledClasses-routes')
 const usersRoutes = require('./routes/users-routes');
 const HttpError = require('./models/http-error');
 
@@ -12,6 +13,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use('/api/trainer', trainerRoutes);
+app.use('/api/trainer/scheduleClass', scheduleRoutes);
 app.use('/api/users', usersRoutes);
 
 app.use((req, res, next) => {

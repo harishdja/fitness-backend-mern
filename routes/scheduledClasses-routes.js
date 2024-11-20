@@ -1,7 +1,7 @@
 const express = require('express');
 const { check } = require('express-validator');
 
-const scheduledClassesControllers = require('../controllers/scheduledClasses-controllers');
+const scheduledClassesControllers = require('../controllers/scheduledClass-controllers');
 
 const router = express.Router();
 
@@ -16,7 +16,8 @@ router.get('/search', (req, res, next) => {
         res.status(400).send('Bad Request: Missing required query parameters');
     }
 });
-router.get('/getAllScheduledClasss', scheduledClassesControllers.getAllScheduledClasss);
+router.get('/getAllScheduledClasss', scheduledClassesControllers.getAllScheduledClass);
+router.get('/getAllSchedules/:trainerId', scheduledClassesControllers.getSchedulesByTrainerId);
 
 router.post(
   '/',
@@ -25,7 +26,7 @@ router.post(
 
 router.post(
     '/createScheduledClasss',
-    scheduledClassesControllers.createScheduledClasss
+    scheduledClassesControllers.createScheduledClass
   );
   
 router.patch(
@@ -39,6 +40,6 @@ router.patch(
   scheduledClassesControllers.updateScheduledClass
 );
 
-router.delete('/:pid', scheduledClassesControllers.deleteScheduledClass);
+router.delete('/:sid', scheduledClassesControllers.deleteScheduledClass);
 
 module.exports = router;

@@ -1,18 +1,16 @@
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
-const HttpError = require('../models/http-error'); 
-const ScheduledClass = require('../models/scheduledClass');
-const User = require('../models/user');
-
+const { validationResult } = require("express-validator");
+const mongoose = require("mongoose");
+const HttpError = require("../models/http-error");
+const ScheduledClass = require("../models/scheduledClass");
+const User = require("../models/user");
+const Trainer = require("../models/trainer");
 const getAllScheduledClass = async (req, res, next) => {
- 
-
- let scheduledClass
+  let scheduledClass;
   try {
     scheduledClass = await ScheduledClass.find();
   } catch (err) {
     const error = new HttpError(
-      'Something went wrong, could not find a place.',
+      "Something went wrong, could not find a place.",
       500
     );
     return next(error);
@@ -20,7 +18,7 @@ const getAllScheduledClass = async (req, res, next) => {
 
   if (!scheduledClass) {
     const error = new HttpError(
-      'Could not find a scheduledClass for the provided id.',
+      "Could not find a scheduledClass for the provided id.",
       404
     );
     return next(error);
@@ -29,128 +27,150 @@ const getAllScheduledClass = async (req, res, next) => {
   res.json({ scheduledClass: scheduledClass });
 };
 const getScheduledClassByName = async (req, res, next) => {
-   const name= req.params.pid;
-    console.log(name)
-    let scheduledClass
-     try {
-       scheduledClass = await ScheduledClass.find({ name: { $regex: name, $options: 'i' } });
-     } catch (err) {
-       const error = new HttpError(
-         'Something went wrong, could not find a place.',
-         500
-       );
-       return next(error);
-     }
-   
-     if (!scheduledClass) {
-       const error = new HttpError(
-         'Could not find a scheduledClass for the provided id.',
-         404
-       );
-       return next(error);
-     }
-   
-     res.json({ scheduledClass: scheduledClass });
-   };
-   
-   const getScheduledClassByExpertise = async (req, res, next) => {
-    const expertise= req.query.expertise;
-    console.log(expertise)
-     let scheduledClass
-      try {
-        scheduledClass = await ScheduledClass.find({ expertise:{ $regex: expertise, $options: 'i' }});
-      } catch (err) {
-        const error = new HttpError(
-          'Something went wrong, could not find a place.',
-          500
-        );
-        return next(error);
-      }
-    
-      if (!scheduledClass) {
-        const error = new HttpError(
-          'Could not find a scheduledClass for the provided id.',
-          404
-        );
-        return next(error);
-      }
-    
-      res.json({ scheduledClass: scheduledClass });
-    };
-    
- 
-const createScheduledClass = async (req, res, next) => {
-  const { name, qualifications, expertise, rating,reviews,profilePic } = req.body;
-
-  const createdScheduledClass = new ScheduledClass({
-    name, 
-    qualifications,
-     expertise,
-      rating,
-      reviews,
-      profilePic 
-  });
-try {
-  await createdScheduledClass.save();
-} catch (err) {
-  const error = new HttpError(
-    'Signing up failed, please try again.',
-    500
-  );
-  return next(error);
-}
-res.status(201).json({ scheduledClass: createdScheduledClass.toObject({getters:true})});
- 
-};
-const createScheduledClass = async (req, res, next) => {
-    const scheduledClass = req.body;
-    let    createdScheduledClass
-    try {
-     createdScheduledClass = await ScheduledClass.insertMany(scheduledClass);
- 
+  const name = req.params.pid;
+  console.log(name);
+  let scheduledClass;
+  try {
+    scheduledClass = await ScheduledClass.find({
+      name: { $regex: name, $options: "i" },
+    });
   } catch (err) {
     const error = new HttpError(
-      'Signing up failed, please try again.',
+      "Something went wrong, could not find a place.",
       500
     );
     return next(error);
   }
-  res.status(201).json({ scheduledClass: createdScheduledClass});
-   
-  };
-const getPlacesByUserId = async (req, res, next) => {
-    const userId = req.params.uid;
-  
-    // let places;
-    let userWithPlaces;
-    try {
-      userWithPlaces = await User.findById(userId).populate('places');
-    } catch (err) {
-      const error = new HttpError(
-        'Fetching places failed, please try again later',
-        500
-      );
-      return next(error);
-    }
-  
-    // if (!places || places.length === 0) {
-    if (!userWithPlaces || userWithPlaces.places.length === 0) {
-      return next(
-        new HttpError('Could not find places for the provided user id.', 404)
-      );
-    }
-  
-    res.json({
-      places: userWithPlaces.places.map(place =>
-        place.toObject({ getters: true })
-      )
+
+  if (!scheduledClass) {
+    const error = new HttpError(
+      "Could not find a scheduledClass for the provided id.",
+      404
+    );
+    return next(error);
+  }
+
+  res.json({ scheduledClass: scheduledClass });
+};
+
+const getScheduledClassByExpertise = async (req, res, next) => {
+  const expertise = req.query.expertise;
+  console.log(expertise);
+  let scheduledClass;
+  try {
+    scheduledClass = await ScheduledClass.find({
+      expertise: { $regex: expertise, $options: "i" },
     });
-  };
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not find a place.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!scheduledClass) {
+    const error = new HttpError(
+      "Could not find a scheduledClass for the provided id.",
+      404
+    );
+    return next(error);
+  }
+
+  res.json({ scheduledClass: scheduledClass });
+};
+
+const createScheduledClass = async (req, res, next) => {
+  const { trainerId, type, date,duration, schedules, capacity } = req.body;
+
+  const createdScheduledClass = new ScheduledClass({
+    classType:type,
+    duration,
+    date,
+    schedules:schedules,
+    capacity,
+    availableSpots: capacity,
+    creator: trainerId,
+  });
+
+  let trainer;
+  try {
+    trainer = await Trainer.findById(trainerId);
+  } catch (err) {
+    const error = new HttpError(
+      "Creatings schedule class failed, please try again",
+      500
+    );
+    return next(error);
+  }
+
+  if (!trainer) {
+    const error = new HttpError("Could not find trainer for provided id", 404);
+    return next(error);
+  }
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdScheduledClass.save({ session: sess });
+    trainer.schedules.push(createdScheduledClass.id);
+    await trainer.save({ session: sess });
+    await sess.commitTransaction();
+  } catch (err) {
+    console.log(err);
+    const error = new HttpError(
+      "Creating schedule class failed, please try again",
+      500
+    );
+    return next(error);
+  }
+  res.status(201).json({
+    scheduledClass: createdScheduledClass.toObject({ getters: true }),
+  });
+};
+const createScheduledClasses = async (req, res, next) => {
+  const scheduledClass = req.body;
+  let createdScheduledClass;
+  try {
+    createdScheduledClass = await ScheduledClass.insertMany(scheduledClass);
+  } catch (err) {
+    const error = new HttpError("Signing up failed, please try again.", 500);
+    return next(error);
+  }
+  res.status(201).json({ scheduledClass: createdScheduledClass });
+};
+const getSchedulesByTrainerId = async (req, res, next) => {
+  const userId = req.params.trainerId;
+
+  // let places;
+  let trainerWithSchedules;
+  try {
+    trainerWithSchedules = await Trainer.findById(userId).populate("schedules");
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching places failed, please try again later",
+      500
+    );
+    return next(error);
+  }
+ 
+  if (!trainerWithSchedules || trainerWithSchedules.schedules.length === 0) {
+    return next(
+      new HttpError("Could not find places for the provided user id.", 404)
+    );
+  }
+
+  res.json({
+    schedules: trainerWithSchedules.schedules.map((schedule) =>
+      schedule.toObject({ getters: true })
+    ),
+  });
+};
 const updateScheduledClass = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
-      new HttpError('Invalid inputs passed, please check your data.', 422)
+      new HttpError("Invalid inputs passed, please check your data.", 422)
     );
   }
 
@@ -162,7 +182,7 @@ const updateScheduledClass = async (req, res, next) => {
     place = await Place.findById(placeId);
   } catch (err) {
     const error = new HttpError(
-      'Something went wrong, could not update place.',
+      "Something went wrong, could not update place.",
       500
     );
     return next(error);
@@ -175,7 +195,7 @@ const updateScheduledClass = async (req, res, next) => {
     await place.save();
   } catch (err) {
     const error = new HttpError(
-      'Something went wrong, could not update place.',
+      "Something went wrong, could not update place.",
       500
     );
     return next(error);
@@ -185,42 +205,56 @@ const updateScheduledClass = async (req, res, next) => {
 };
 
 const deleteScheduledClass = async (req, res, next) => {
-  const scheduledClassId = req.params.pid;
+  const scheduledClassId = req.params.sid;
 
   let scheduledClass;
   try {
-    scheduledClass = await ScheduledClass.findById(scheduledClassId)
+    scheduledClass = await ScheduledClass.findById(scheduledClassId).populate('creator');
   } catch (err) {
     const error = new HttpError(
-      'Something went wrong, could not delete scheduledClass.',
+      "Something went wrong, could not delete scheduledClass.",
       500
     );
     return next(error);
   }
 
   if (!scheduledClass) {
-    const error = new HttpError('Could not find scheduledClass for this id.', 404);
+    const error = new HttpError(
+      "Could not find scheduledClass for this id.",
+      404
+    );
     return next(error);
   }
 
   try {
-    await scheduledClass.remove();
+
+   
+  
+     
+    console.log(scheduledClass)
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await scheduledClass.remove({ session: sess });
+    scheduledClass.creator.schedules.pull(scheduledClass);
+    await scheduledClass.creator.save({ session: sess });
+    await sess.commitTransaction();
+
   } catch (err) {
+    console.log(err)
     const error = new HttpError(
-      'Something went wrong, could not delete scheduledClass.',
+      "Something went wrong, could not delete scheduledClass.",
       500
     );
     return next(error);
   }
 
-  res.status(200).json({ message: 'Deleted scheduledClass.' });
+  res.status(200).json({ message: "Deleted scheduledClass." });
 };
 
-exports.createScheduledClass=createScheduledClass
-exports.getScheduledClassByExpertise=getScheduledClassByExpertise
-exports.getScheduledClassByName=getScheduledClassByName;
-exports.getAllScheduledClass = getAllScheduledClass;
-exports.getPlacesByUserId = getPlacesByUserId;
 exports.createScheduledClass = createScheduledClass;
+exports.getScheduledClassByExpertise = getScheduledClassByExpertise;
+exports.getScheduledClassByName = getScheduledClassByName;
+exports.getAllScheduledClass = getAllScheduledClass;
+exports.getSchedulesByTrainerId = getSchedulesByTrainerId;
 exports.updateScheduledClass = updateScheduledClass;
 exports.deleteScheduledClass = deleteScheduledClass;
