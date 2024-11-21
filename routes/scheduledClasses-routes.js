@@ -5,7 +5,43 @@ const scheduledClassesControllers = require('../controllers/scheduledClass-contr
 
 const router = express.Router();
 
-router.get('/search', (req, res, next) => {
+
+router.get('/getAllSchedules/', scheduledClassesControllers.getSchedulesByTrainerId);
+
+router.post(
+  '/',
+  scheduledClassesControllers.createScheduledClass
+);
+
+
+
+router.patch(
+  '/updateSchedule/',
+  // [
+  //   check('date')
+  //     .not()
+  //     .isEmpty(),
+  //     check('scheduleId')
+  //     .not()
+  //     .isEmpty(),
+  //   check('description').isLength({ min: 5 })
+  // ],
+  scheduledClassesControllers.updateScheduledClass
+);
+
+router.delete('/deleteSchedule', scheduledClassesControllers.deleteScheduledClass);
+
+// Upcoming scheduled class APIs
+
+router.post(
+    '/createScheduledClasss',
+    scheduledClassesControllers.createScheduledClass
+  );
+  
+
+  router.get('/getAllScheduledClasss', scheduledClassesControllers.getAllScheduledClass);
+
+  router.get('/search', (req, res, next) => {
     const { expertise, name } = req.query;
 
     if (expertise) {
@@ -16,30 +52,5 @@ router.get('/search', (req, res, next) => {
         res.status(400).send('Bad Request: Missing required query parameters');
     }
 });
-router.get('/getAllScheduledClasss', scheduledClassesControllers.getAllScheduledClass);
-router.get('/getAllSchedules/:trainerId', scheduledClassesControllers.getSchedulesByTrainerId);
-
-router.post(
-  '/',
-  scheduledClassesControllers.createScheduledClass
-);
-
-router.post(
-    '/createScheduledClasss',
-    scheduledClassesControllers.createScheduledClass
-  );
-  
-router.patch(
-  '/:pid',
-  [
-    check('title')
-      .not()
-      .isEmpty(),
-    check('description').isLength({ min: 5 })
-  ],
-  scheduledClassesControllers.updateScheduledClass
-);
-
-router.delete('/:sid', scheduledClassesControllers.deleteScheduledClass);
 
 module.exports = router;
