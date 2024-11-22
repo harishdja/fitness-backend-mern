@@ -7,9 +7,10 @@ const trainerRoutes = require('./routes/trainer-routes');
 const scheduleRoutes=require('./routes/scheduledClasses-routes')
 const usersRoutes = require('./routes/users-routes');
 const HttpError = require('./models/http-error');
-
+const cors = require('cors');
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/trainer', trainerRoutes);
