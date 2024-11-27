@@ -64,8 +64,10 @@ const login = async (req, res, next) => {
     );
     return next(error);
   }
-
-  res.json({message: 'Logged in!',type:existingUser.type,id:existingUser.id});
+  // Create a copy of the user object and remove the password field
+  const userWithoutPassword = { ...existingUser._doc };
+  delete userWithoutPassword.password;
+  res.json({...userWithoutPassword,message: 'Logged in!'});
 };
 
 exports.getUsers = getUsers;

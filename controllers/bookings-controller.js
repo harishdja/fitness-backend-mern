@@ -105,7 +105,7 @@ const getBookingsByMemberId = async (req, res, next) => {
   if (!memberWithBookings || memberWithBookings.bookings.length === 0) {
     return next(
       new HttpError(
-        "Could not find bookings for the provided schedule id.",
+        "Could not find bookings for the provided member id.",
         404
       )
     );
@@ -177,130 +177,78 @@ const updateBookedClass = async (req, res, next) => {
     );
   }
 
-  const { date, bookings, scheduleId } = req.body;
+  const { bookingId, scheduleId, date,time,classType,duration,confirmationNotificationSent } = req.body;
+
 
   let schedule;
   try {
-    schedule = await Booking.findById(scheduleId);
+    schedule = await Schedule.findById(scheduleId);
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong, could not update bookings.",
+      "Creatings booking class failed, please try again",
       500
     );
     return next(error);
   }
+  let bookedClass;
+  try {
+    bookedClass = await Booking.findById(bookingId).populate("scheduleId");
+  } catch (err) {
+    const error = new HttpError(
+      "Creatings booking class failed, please try again.",
+      500
+    );
+    return next(error);
+  }
+  if(!bookedClass)
+  {
+    const error = new HttpError("Could not find booking for provided booking id", 404);
+    return next(error);
+  }
+  console.log('bookedClass.scheduleId.bookings',bookedClass.scheduleId.bookings)
+  if (!schedule) {
+    const error = new HttpError("Could not find schedule for provided schedule id", 404);
+    return next(error);
+  }
 
-  schedule.date = date;
-  schedule.bookings = bookings;
+
+  if(schedule.availableSpots===0)
+  {
+    const error = new HttpError("Could not book seats, seats are booked", 404);
+    return next(error);
+  }
+  bookedClass.date = date;
+  bookedClass.time = time;
+  bookedClass.classType=classType;
+  bookedClass.duration=duration;
+  bookedClass.confirmationNotificationSent=confirmationNotificationSent;
 
   try {
-    await schedule.save();
+    
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    bookedClass.scheduleId.bookings.pull(bookedClass);
+    bookedClass.scheduleId.availableSpots=bookedClass.scheduleId.availableSpots+1
+    schedule.bookings.push(bookedClass.id);
+    schedule.availableSpots=schedule.availableSpots-1
+    await schedule.save({ session: sess });
+    bookedClass.scheduleId.save({ session: sess })
+    bookedClass.scheduleId=scheduleId;
+    await bookedClass.save({ session: sess });
+    await sess.commitTransaction();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
-      "Something went wrong, could not update bookings.",
+      "Something went wrong, could not update bookedClass.",
       500
     );
     return next(error);
   }
-
   res.status(200).json({ schedule: schedule.toObject({ getters: true }) });
 };
 
-///       Upcoming API that will be used for filtering
-
-const createBookedClasses = async (req, res, next) => {
-  const bookedClass = req.body;
-  let createdBookedClass;
-  try {
-    createdBookedClass = await Booking.insertMany(bookedClass);
-  } catch (err) {
-    const error = new HttpError("Signing up failed, please try again.", 500);
-    return next(error);
-  }
-  res.status(201).json({ bookedClass: createdBookedClass });
-};
-
-const getAllBookedClass = async (req, res, next) => {
-  let bookedClass;
-  try {
-    bookedClass = await Booking.find();
-  } catch (err) {
-    const error = new HttpError(
-      "Something went wrong, could not find a place.",
-      500
-    );
-    return next(error);
-  }
-
-  if (!bookedClass) {
-    const error = new HttpError(
-      "Could not find a bookedClass for the provided id.",
-      404
-    );
-    return next(error);
-  }
-
-  res.json({ bookedClass: bookedClass });
-};
-
-const getBookedClassByName = async (req, res, next) => {
-  const name = req.params.pid;
-  console.log(name);
-  let bookedClass;
-  try {
-    bookedClass = await Booking.find({
-      name: { $regex: name, $options: "i" },
-    });
-  } catch (err) {
-    const error = new HttpError(
-      "Something went wrong, could not find a place.",
-      500
-    );
-    return next(error);
-  }
-
-  if (!bookedClass) {
-    const error = new HttpError(
-      "Could not find a bookedClass for the provided id.",
-      404
-    );
-    return next(error);
-  }
-
-  res.json({ bookedClass: bookedClass });
-};
-
-const getBookedClassByExpertise = async (req, res, next) => {
-  const expertise = req.query.expertise;
-  console.log(expertise);
-  let bookedClass;
-  try {
-    bookedClass = await Booking.find({
-      expertise: { $regex: expertise, $options: "i" },
-    });
-  } catch (err) {
-    const error = new HttpError(
-      "Something went wrong, could not find a place.",
-      500
-    );
-    return next(error);
-  }
-
-  if (!bookedClass) {
-    const error = new HttpError(
-      "Could not find a bookedClass for the provided id.",
-      404
-    );
-    return next(error);
-  }
-
-  res.json({ bookedClass: bookedClass });
-};
-
+ 
 exports.createBookedClass = createBookedClass;
-exports.getBookedClassByExpertise = getBookedClassByExpertise;
-exports.getBookedClassByName = getBookedClassByName;
-exports.getAllBookedClass = getAllBookedClass;
 exports.getBookingsByMemberId = getBookingsByMemberId;
 exports.updateBookedClass = updateBookedClass;
 exports.deleteBookedClass = deleteBookedClass;

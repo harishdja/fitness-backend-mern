@@ -1,14 +1,14 @@
 {
 	"info": {
-		"_postman_id": "84b83da5-ed39-473a-9c43-95fca7072960",
-		"name": "Trainer APIs",
+		"_postman_id": "7a78429e-ec19-41b1-85c8-9b4619d369dc",
+		"name": "Member APIs",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "19922205",
-		"_collection_link": "https://lunar-crater-566249.postman.co/workspace/MOngo-workspace~2c83ef8d-f1ef-4766-940a-2c1573536d6f/collection/19922205-84b83da5-ed39-473a-9c43-95fca7072960?action=share&source=collection_link&creator=19922205"
+		"_collection_link": "https://lunar-crater-566249.postman.co/workspace/MOngo-workspace~2c83ef8d-f1ef-4766-940a-2c1573536d6f/collection/19922205-7a78429e-ec19-41b1-85c8-9b4619d369dc?action=share&source=collection_link&creator=19922205"
 	},
 	"item": [
 		{
-			"name": "signup member",
+			"name": "signup trainer",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -24,7 +24,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\":\"Harish\",\n    \"email\":\"abc@gmail.com\",\n    \"password\":\"harishdja\",\n    \"type\":\"member\"\n\n}",
+					"raw": "{\n    \"name\":\"Harish\",\n    \"email\":\"sdfds@gmail.com\",\n    \"password\":\"harishdja\",\n    \"type\":\"trainer\"\n\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -67,7 +67,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n \n  \"email\":\"abc@gmail.com\",\n    \"password\":\"harishdja\"\n    }",
+					"raw": "{\n \n    \"email\":\"sdfds@gmail.com\",\n    \"password\":\"harishdja\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -94,7 +94,7 @@
 			"response": []
 		},
 		{
-			"name": "book a class",
+			"name": "schedule a class",
 			"event": [
 				{
 					"listen": "test",
@@ -115,7 +115,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": " \n  { \"scheduleId\": \"674700cdad7fcfabc018c969\",  \"date\":\"2024-12-21\",\"time\": \"09:00:00\",\"classType\": \"Kickboxing\", \"duration\": \"60 min\", \"confirmationNotificationSent\": true,\"memberId\": \"674701baad7fcfabc018c96c\" }\n\n \n ",
+					"raw": " \n  { \"trainerId\": \"6747008cad7fcfabc018c968\",  \"date\":\"2024-12-21\",\"schedules\": [\"09:00:00\"],\"type\": \"Yoga\", \"duration\": \"60 min\", \"capacity\": 10   }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -123,7 +123,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5001/api/member/bookClass",
+					"raw": "http://127.0.0.1:5001/api/trainer/scheduleClass",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -134,8 +134,8 @@
 					"port": "5001",
 					"path": [
 						"api",
-						"member",
-						"bookClass"
+						"trainer",
+						"scheduleClass"
 					]
 				},
 				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
@@ -143,7 +143,7 @@
 			"response": []
 		},
 		{
-			"name": "getallbookings",
+			"name": "get all schedules for a trainer",
 			"event": [
 				{
 					"listen": "test",
@@ -162,7 +162,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5001/api/member/getAllBookings?memberId=674701baad7fcfabc018c96c",
+					"raw": "http://127.0.0.1:5001/api/trainer/scheduleClass/getAllSchedules?trainerId=6747008cad7fcfabc018c968",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -173,13 +173,14 @@
 					"port": "5001",
 					"path": [
 						"api",
-						"member",
-						"getAllBookings"
+						"trainer",
+						"scheduleClass",
+						"getAllSchedules"
 					],
 					"query": [
 						{
-							"key": "memberId",
-							"value": "674701baad7fcfabc018c96c"
+							"key": "trainerId",
+							"value": "6747008cad7fcfabc018c968"
 						}
 					]
 				},
@@ -188,7 +189,7 @@
 			"response": []
 		},
 		{
-			"name": "Delete booked class",
+			"name": "Delete scheduleclass",
 			"event": [
 				{
 					"listen": "test",
@@ -217,7 +218,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5001/api/member/deleteBooking?bookingId=674703473ba0fbad15666db9",
+					"raw": "http://127.0.0.1:5001/api/trainer/scheduleClass/deleteSchedule?scheduleId=6747034b3ba0fbad15666dba",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -228,13 +229,14 @@
 					"port": "5001",
 					"path": [
 						"api",
-						"member",
-						"deleteBooking"
+						"trainer",
+						"scheduleClass",
+						"deleteSchedule"
 					],
 					"query": [
 						{
-							"key": "bookingId",
-							"value": "674703473ba0fbad15666db9"
+							"key": "scheduleId",
+							"value": "6747034b3ba0fbad15666dba"
 						}
 					]
 				},
@@ -243,7 +245,7 @@
 			"response": []
 		},
 		{
-			"name": "reschedule a booking",
+			"name": "reschedule a class",
 			"event": [
 				{
 					"listen": "test",
@@ -264,7 +266,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": " \n  { \"bookingId\":\"674706a829191fbb95de9833\", \"scheduleId\": \"674700cdad7fcfabc018c969\",  \"date\":\"2024-11-12\",\"time\": \"17:00:00\",\"classType\": \"Kickboxing\", \"duration\": \"60 min\", \"confirmationNotificationSent\": true,\"memberId\": \"674701baad7fcfabc018c96c\" }",
+					"raw": " \n  {\"date\":\"2024-12-12\",\"schedules\": [\"10:00:00\"],\"scheduleId\":\"674700ecad7fcfabc018c96a\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -272,7 +274,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5001/api/member/rescheduleBookClass",
+					"raw": "http://127.0.0.1:5001/api/trainer/scheduleClass/updateSchedule",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -283,8 +285,9 @@
 					"port": "5001",
 					"path": [
 						"api",
-						"member",
-						"rescheduleBookClass"
+						"trainer",
+						"scheduleClass",
+						"updateSchedule"
 					]
 				},
 				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."

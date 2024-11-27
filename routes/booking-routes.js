@@ -14,4 +14,10 @@ router.post(
 );
 
 router.delete('/deleteBooking', bookingClassControllers.deleteBookedClass);
+router.patch(
+  '/rescheduleBookClass',
+  bookingClassControllers.updateBookedClass
+);
+
+
 module.exports = router;
