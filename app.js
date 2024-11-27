@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const trainerRoutes = require('./routes/trainer-routes');
 const scheduleRoutes=require('./routes/scheduledClasses-routes')
 const usersRoutes = require('./routes/users-routes');
+const bookingRoutes = require('./routes/booking-routes');
 const HttpError = require('./models/http-error');
 const cors = require('cors');
 const app = express();
@@ -16,6 +17,7 @@ app.use(bodyParser.json());
 app.use('/api/trainer', trainerRoutes);
 app.use('/api/trainer/scheduleClass', scheduleRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/member/', bookingRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError('Could not find this route.', 404);

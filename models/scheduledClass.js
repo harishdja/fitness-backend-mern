@@ -10,7 +10,8 @@ const scheduledClassSchema = new Schema({
     schedules:  [{ type: String, required: true }],
     capacity:{ type: Number, required: true },
     availableSpots:{ type: Number, required: true },
-    creator: { type: mongoose.Types.ObjectId, required: true, ref: 'Trainer'}
+    creator: { type: mongoose.Types.ObjectId, required: true, ref: 'Trainer'},
+    bookings:[{ type: mongoose.Types.ObjectId, ref: 'Booking'}]
 });
 
 module.exports = mongoose.model('ScheduledClass', scheduledClassSchema);
